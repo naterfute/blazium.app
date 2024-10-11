@@ -1,6 +1,12 @@
 name: Golang Build & HTTP Validation
 
-on: [push, pull_request, merge_group]
+
+
+on:
+  push:
+    branches: [ 'master', 'main', 'prod', 'production' ]
+  pull_request:
+    branches: [ 'master', 'main', 'prod', 'production' ]
 
 concurrency:
   group: ci-${{ github.actor }}-${{ github.head_ref || github.run_number }}-${{ github.ref }}-runner
