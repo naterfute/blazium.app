@@ -8,28 +8,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="static/css/style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <!-- <script type='text/javascript' src='js/jquery-1.11.1.min.js'></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js" integrity="sha512-Kef5sc7gfTacR7TZKelcrRs15ipf7+t+n7Zh6mKNJbmW+/RRdCW9nwfLn4YX0s2nO6Kv5Y2ChqgIakaC6PW09A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script type="text/javascript" src="static/js/background.js"></script>
 
   <style>
+    /* General body settings */
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Full-screen particle container */
     #particles {
       height: 100vh;
       width: 100vw;
       position: relative;
     }
 
+    /* Logo settings */
     #logo {
       position: fixed;
-      top: 70px;
+      top: 50px;
       left: 50%;
       transform: translateX(-50%);
       text-align: center;
     }
 
+    /* Responsive logo sizing */
+    #logo img {
+      width: 250px;
+      height: auto;
+    }
+
+    /* Intro section settings */
+    #intro {
+      position: fixed;
+      top: 200px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+    /* Release info box */
     #release-info {
       position: fixed;
-      bottom: 70px;
+      bottom: 50px;
       left: 50%;
       transform: translateX(-50%);
       background-color: #1e1e1e;
@@ -41,17 +65,50 @@
       z-index: 10;
     }
 
-    #intro {
-      position: fixed;
-      top: 450px; /* Adjusted to be directly below the logo */
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
+    /* Responsive for smaller screens */
+    @media (max-width: 768px) {
+      #logo img {
+        width: 200px;
+      }
+
+      #intro {
+        top: 150px;
+      }
+
+      #release-info {
+        width: 80%;
+        padding: 15px;
+      }
     }
 
-    body {
-      margin: 0;
-      overflow: hidden;
+    @media (max-width: 480px) {
+      #logo img {
+        width: 150px;
+      }
+
+      #intro {
+        top: 120px;
+      }
+
+      #release-info {
+        width: 90%;
+        padding: 10px;
+      }
+    }
+
+    /* Styling the hr and links */
+    hr {
+      width: 50%;
+      background-color: #E83951;
+      border-color: #E83951;
+    }
+
+    a {
+      color: white;
+    }
+
+    a:hover {
+      color: #E83951;
     }
   </style>
 
@@ -62,18 +119,18 @@
 <div id="particles">
   <!-- Logo Image -->
   <div id="logo">
-    <img src="static/assets/logo.png" alt="Blazium Engine Logo" style="width: 350px; height: auto;">
+    <img src="static/assets/logo.png" alt="Blazium Engine Logo">
   </div>
 
   <!-- Intro Section -->
   <div id="intro">
     <h2 style="font-family: 'Syncopate', sans-serif; font-weight: 10;">Blazium Engine</h2>
-    <hr style="width: 50%; background-color: #E83951; border-color: #E83951;">
-    <a href="https://discord.gg/sZaf9KYzDp" style="color: white;"><i class="fab fa-discord" style="font-size: 2em;"></i></a>
+    <hr>
+    <a href="https://discord.gg/sZaf9KYzDp"><i class="fab fa-discord" style="font-size: 2em;"></i></a>
     &nbsp
-    <a href="https://github.com/blazium-engine/blazium" style="color: white;"><i class="fab fa-github" style="font-size: 2em;"></i></a>
+    <a href="https://github.com/blazium-engine/blazium"><i class="fab fa-github" style="font-size: 2em;"></i></a>
     &nbsp
-    <a href="https://x.com/BlaziumEngine" style="color: white;"><i class="fab fa-x-twitter" style="font-size: 2em;"></i></a>
+    <a href="https://x.com/BlaziumEngine"><i class="fab fa-x-twitter" style="font-size: 2em;"></i></a>
   </div>
 
   <!-- Release Information Box -->
