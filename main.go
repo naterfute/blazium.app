@@ -145,6 +145,7 @@ func embedMiddleware(next http.Handler) http.Handler {
                     <meta property="og:title" content="Blazium Engine">
                     <meta property="og:description" content="Blazium Engine forked from Godot.">
                     <meta property="og:image" content="https://blazium.app/static/assets/logo.png">
+					<meta property="og:image" content="https://squid-app-bpdbo.ondigitalocean.app//static/assets/logo.png">
                     <meta property="og:url" content="https://blazium.app">
                     <meta property="og:type" content="website">
                     <meta name="twitter:card" content="summary_large_image">
