@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -61,7 +62,8 @@ func main() {
 	// API endpoint for /api/mirrorlist/:version/json
 	r.HandleFunc("/api/mirrorlist/{version}/json", MirrorListHandler).Methods("GET")
 
-	corsHandler := enableCORS(r)
+	embedHandler := embedMiddleware(r)
+	corsHandler := enableCORS(embedHandler)
 
 	// Start the server
 	fmt.Println("Starting server on :8080")
@@ -118,6 +120,46 @@ func enableCORS(next http.Handler) http.Handler {
         }
 
         // Call the next handler
+        next.ServeHTTP(w, r)
+    })
+}
+
+func embedMiddleware(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Get the User-Agent header and convert it to lowercase for case-insensitive comparison
+        userAgent := strings.ToLower(r.Header.Get("User-Agent"))
+
+        // Check if the User-Agent contains "discordbot" (case-insensitive)
+        if strings.Contains(userAgent, "discordbot") {
+            // Set appropriate headers for HTML content and caching
+            w.Header().Set("Content-Type", "text/html; charset=utf-8")
+            w.Header().Set("Cache-Control", "max-age=3600") // Cache the response for 1 hour
+
+            // Write the Open Graph meta tags for Discord embeds
+            w.Write([]byte(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta property="og:title" content="Blazium Engine">
+                    <meta property="og:description" content="Blazium Engine forked from Godot.">
+                    <meta property="og:image" content="https://blazium.app/static/assets/logo.png">
+                    <meta property="og:url" content="https://blazium.app">
+                    <meta property="og:type" content="website">
+                    <meta name="twitter:card" content="summary_large_image">
+                    <meta property="og:site_name" content="Blazium Engine">
+                    <title>Blazium Engine</title>
+                </head>
+                <body>
+                    <h1>Welcome to Blazium Engine</h1>
+                </body>
+                </html>
+            `))
+            return
+        }
+
+        // If the User-Agent is not from Discord, pass the request to the next handler
         next.ServeHTTP(w, r)
     })
 }
