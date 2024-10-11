@@ -1,0 +1,7 @@
+{
+    "mirrors": [
+        "http://mirror1.example.com",
+        "http://mirror2.example.com",
+        "http://mirror3.example.com"
+    ]
+}
