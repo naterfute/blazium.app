@@ -61,9 +61,11 @@ func main() {
 	// API endpoint for /api/mirrorlist/:version/json
 	r.HandleFunc("/api/mirrorlist/{version}/json", MirrorListHandler).Methods("GET")
 
+	corsHandler := enableCORS(r)
+
 	// Start the server
 	fmt.Println("Starting server on :8080")
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8080", corsHandler))
 }
 
 // MirrorListHandler handles the /api/mirrorlist/:version/json endpoint
@@ -100,4 +102,22 @@ func MirrorListHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Error writing JSON response: %v", err)
 	}
+}
+
+func enableCORS(next http.Handler) http.Handler {
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        // Set CORS headers
+        w.Header().Set("Access-Control-Allow-Origin", "*") // Allow all origins, you can restrict this to a specific domain
+        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+        // Handle preflight OPTIONS requests
+        if r.Method == "OPTIONS" {
+            w.WriteHeader(http.StatusOK)
+            return
+        }
+
+        // Call the next handler
+        next.ServeHTTP(w, r)
+    })
 }
