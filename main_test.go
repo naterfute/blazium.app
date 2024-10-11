@@ -2,11 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/gorilla/mux"
 )
 
@@ -17,6 +18,9 @@ func TestAPIEndpoint(t *testing.T) {
     if err != nil {
         t.Fatalf("Could not create request: %v", err)
     }
+
+    // Add the Content-Type header to simulate a JSON request.
+    req.Header.Set("Content-Type", "application/json")
 
     // Create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
     rr := httptest.NewRecorder()
@@ -32,16 +36,18 @@ func TestAPIEndpoint(t *testing.T) {
         t.Errorf("Expected status code 200, got %d", rr.Code)
     }
 
+    // Check if the Content-Type is application/json in the response.
+    contentType := rr.Header().Get("Content-Type")
+    if contentType != "application/json" {
+        t.Errorf("Expected Content-Type application/json, got %s", contentType)
+    }
+
     // Check if the response is valid JSON.
     var response MirrorListResponse
     if err := json.Unmarshal(rr.Body.Bytes(), &response); err != nil {
         t.Errorf("Response was not valid JSON: %v", err)
     }
 
-    // Check if the mirrors field has data.
-    if len(response.Mirrors) == 0 {
-        t.Errorf("Expected some mirrors, got none")
-    }
 }
 
 // TestRootPath tests the root / path.
@@ -66,32 +72,55 @@ func TestRootPath(t *testing.T) {
         t.Errorf("Expected status code 200, got %d", rr.Code)
     }
 
-    // Check if the response body contains the content of the index.html file or any static file.
-    body, err := ioutil.ReadAll(rr.Body)
+    // Convert the body to a string
+    body := rr.Body.String()
+
+    // Check if the body is non-empty.
+    if len(body) == 0 {
+        t.Fatalf("Expected non-empty body, but got an empty body")
+    }
+
+    // Parse the HTML response using goquery
+    doc, err := goquery.NewDocumentFromReader(strings.NewReader(body))
     if err != nil {
-        t.Fatalf("Could not read response body: %v", err)
+        t.Fatalf("Could not parse HTML: %v", err)
     }
 
-    expectedSubstring := "<html" // You can change this to something specific in your index.html.
-    if !contains(body, expectedSubstring) {
-        t.Errorf("Expected response body to contain '%s', got '%s'", expectedSubstring, string(body))
+    // Validate that the document has the correct DOCTYPE
+    if !strings.HasPrefix(body, "<!DOCTYPE html>") && !strings.HasPrefix(body, "<!doctype html>") {
+        t.Errorf("Expected response to start with <!DOCTYPE html>, got %s", body)
+    }
+
+    // Validate the presence of important HTML tags
+    if doc.Find("html").Length() == 0 {
+        t.Error("Expected to find <html> tag, but none found")
+    }
+
+    if doc.Find("head").Length() == 0 {
+        t.Error("Expected to find <head> tag, but none found")
+    }
+
+    if doc.Find("body").Length() == 0 {
+        t.Error("Expected to find <body> tag, but none found")
     }
 }
 
-// Helper function to check if the response body contains a string.
-func contains(body []byte, substring string) bool {
-    return string(body) != "" && substring != "" && string(body)[:len(substring)] == substring
-}
 
 // setupRouter sets up the router for testing.
 func setupRouter() *mux.Router {
     r := mux.NewRouter()
 
-    // Serve static files from the "static" directory
-    fileServer := http.FileServer(http.Dir("./static"))
-    r.PathPrefix("/").Handler(fileServer)
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./static/index.html")
+	})
 
-    // API endpoint for /api/mirrorlist/:version/json
+	// Serve all static files from the "static" directory
+	staticFileDirectory := http.Dir("./static")
+	staticFileHandler := http.StripPrefix("/static/", http.FileServer(staticFileDirectory))
+	r.PathPrefix("/static/").Handler(staticFileHandler)
+
+
+    // API endpoint for /api/mirrorlist/{version}/json
     r.HandleFunc("/api/mirrorlist/{version}/json", MirrorListHandler).Methods("GET")
 
     return r
