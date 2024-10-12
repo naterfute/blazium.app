@@ -54,6 +54,18 @@ func main() {
 		http.ServeFile(w, r, "./static/index.html")
 	})
 
+	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		// Set the content type to application/json
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+
+		// Define a health check response structure
+		response := map[string]string{"status": "healthy"}
+
+		// Encode the response as JSON and send it
+		json.NewEncoder(w).Encode(response)
+	})
+
 	// Serve all static files from the "static" directory
 	staticFileDirectory := http.Dir("./static")
 	staticFileHandler := http.StripPrefix("/static/", http.FileServer(staticFileDirectory))
