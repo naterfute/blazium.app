@@ -55,9 +55,12 @@ body {
 }
 
 #particles {
+  max-height: 2500px;
+  max-width: 2500px;
   height: 100vh;
   width: 100vw;
-  position: relative;
+  position: fixed;
+  text-align: center;
 }
 
 #intro {
@@ -135,10 +138,9 @@ p {
     /* Logo settings */
     #logo {
       position: fixed;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
+      left: 50%; 
+      top: 50%;
+      transform: translate(-50%, -120%)
     }
 
     /* Responsive logo sizing */
